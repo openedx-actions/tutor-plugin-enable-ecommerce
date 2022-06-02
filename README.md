@@ -55,7 +55,7 @@ jobs:
 
     # This action.
       - name: Enable tutor plugin - Ecommerce
-        uses: openedx-actions/tutor-enable-plugin-ecommerce
+        uses: openedx-actions/tutor-enable-plugin-ecommerce@v0.0.1
         if: ${{ env.ENABLE_ECOMMERCE == 'true' }}
         with:
           namespace: openedx-prod
