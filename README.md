@@ -39,24 +39,24 @@ jobs:
           aws-secret-access-key: ${{ secrets.THE_NAME_OF_YOUR_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
 
-    - name: Install and configure kubectl
-      run: |-
-        sudo snap install kubectl --channel=1.23/stable --classic
-        aws eks --region us-east-2 update-kubeconfig --name mrionline-global-live --alias eks-prod
+      - name: Install and configure kubectl
+        run: |-
+          sudo snap install kubectl --channel=1.23/stable --classic
+          aws eks --region us-east-2 update-kubeconfig --name mrionline-global-live --alias eks-prod
 
-    # install Tutor which we'll use for configuring and deploying Open edX
-    - name: Install Tutor
-      run: |-
-        sudo apt install python3 python3-pip libyaml-dev
-        pip install --upgrade pyyaml
-        echo "TUTOR_ROOT=$GITHUB_WORKSPACE/tutor" >> $GITHUB_ENV
-        pip install tutor
-      shell: bash
+      # install Tutor which we'll use for configuring and deploying Open edX
+      - name: Install Tutor
+        run: |-
+          sudo apt install python3 python3-pip libyaml-dev
+          pip install --upgrade pyyaml
+          echo "TUTOR_ROOT=$GITHUB_WORKSPACE/tutor" >> $GITHUB_ENV
+          pip install tutor
+        shell: bash
 
-    # This action.
-    - name: Enable tutor plugin - Ecommerce
-      uses: openedx-actions/tutor-enable-plugin-ecommerce@v0.0.1
-      if: ${{ env.ENABLE_ECOMMERCE == 'true' }}
-      with:
-        namespace: openedx-prod
+      # This action.
+      - name: Enable tutor plugin - Ecommerce
+        uses: openedx-actions/tutor-enable-plugin-ecommerce@v0.0.1
+        if: ${{ env.ENABLE_ECOMMERCE == 'true' }}
+        with:
+          namespace: openedx-prod
 ```
