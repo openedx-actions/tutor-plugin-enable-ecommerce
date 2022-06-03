@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # usage: Use tutor to enable the Open edX Ecommerce service plugin
 #------------------------------------------------------------------------------
-name: enable Ecommerce plugin for tutor
+name: Open edX Tutor k8s enable Ecommerce plugin
 description: Github Action to install and enable the Tutor plugin - Open edX Ecommerce service
 branding:
   icon: 'cloud'
