@@ -21,24 +21,27 @@ runs:
     # and then stored in Kubernetes secrets. These include:
     #   MYSQL_HOST: mysql.app.mrionline.com
     #   MYSQL_PORT: "3306"
-    #   OPENEDX_MYSQL_USERNAME: openedx
-    #   OPENEDX_MYSQL_PASSWORD: **************
+    #   ECOMMERCE_MYSQL_USERNAME: openedx
+    #   ECOMMERCE_MYSQL_PASSWORD: **************
     #   MYSQL_ROOT_USERNAME: root
     #   MYSQL_ROOT_PASSWORD: *************
-    #
-    # Also note that we are using jq to add a prefix of "TUTOR_" to each of the parameter names
-    #
-    # see: https://github.com/Medality-Health/openedx_devops/blob/main/terraform/modules/mysql/main.tf
     - name: fetch MySQL configuration from Kubernetes secrets
-      run: |-
-        kubectl get secret mysql-ecommerce -n ${{ inputs.namespace }}  -o json | jq  '.data | map_values(@base64d)' | jq -r 'keys[] as $k | "TUTOR_\($k|ascii_upcase)=\(.[$k])"' >> $GITHUB_ENV
+      id: get-secret
+      uses: openedx-actions/tutor-k8s-get-secret@v0.0.2
+      with:
+        eks-namespace: ${{ inputs.namespace }}
+        eks-secret-name: mysql-ecommerce
+
+    - name: install ecommerce plugin
+      id: install-plugin
       shell: bash
+      run: pip install tutor-ecommerce
 
     - name: Enable and configure ecommerce plugin
+      id: config-save
+      shell: bash
       run: |-
-        pip install tutor-ecommerce
         tutor plugins enable ecommerce
         tutor config save --set ECOMMERCE_ENABLE_IDENTITY_VERIFICATION=false \
                           --set ECOMMERCE_ENABLED_CLIENT_SIDE_PAYMENT_PROCESSORS=[] \
                           --set ECOMMERCE_CURRENCY=USD
-      shell: bash
