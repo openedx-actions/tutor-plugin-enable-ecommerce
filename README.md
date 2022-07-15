@@ -50,7 +50,7 @@ jobs:
 
       # This action.
       - name: Enable tutor plugin - Ecommerce
-        uses: openedx-actions/tutor-enable-plugin-ecommerce@v1.0.0
+        uses: openedx-actions/tutor-enable-plugin-ecommerce@v1.0.1
         with:
           namespace: openedx-prod
 

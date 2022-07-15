@@ -1,5 +1,8 @@
 # CHANGE LOG
 
+## Version 1.0.0 (2022-07-15)
+
+Add ecommerce-config k8s secret
 ## Version 1.0.0 (2022-06-16)
 
 General production release
