@@ -26,11 +26,34 @@ runs:
     #   MYSQL_ROOT_USERNAME: root
     #   MYSQL_ROOT_PASSWORD: *************
     - name: fetch MySQL configuration from Kubernetes secrets
-      id: get-secret
+      id: get-mysql-secret
       uses: openedx-actions/tutor-k8s-get-secret@v1.0.0
       with:
         eks-namespace: ${{ inputs.namespace }}
         eks-secret-name: mysql-ecommerce
+
+    # retrieve the ecommerce payment processor configuration that
+    # we scaffolded in Terraform and then stored in Kubernetes secrets. These include:
+    #
+    #  ECOMMERCE_CURRENCY: USD                                                                                                        │
+    #  ECOMMERCE_ENABLE_IDENTITY_VERIFICATION: "true"                                                                                 │
+    #  ECOMMERCE_ENABLED_CLIENT_SIDE_PAYMENT_PROCESSORS: ""                                                                           │
+    #  ECOMMERCE_ENABLED_PAYMENT_PROCESSORS: stripe, paypal                                                                           │
+    #  ECOMMERCE_EXTRA_PAYMENT_PROCESSOR_CLASSES: ""                                                                                  │
+    #  ECOMMERCE_EXTRA_PIP_REQUIREMENTS: ""                                                                                           │
+    #  ECOMMERCE_PAYMENT_PROCESSORS: |                                                                                                │
+    #    edx:                                                                                                                         │
+    #        cybersource:                                                                                                             │
+    #            access_key: SET-ME-PLEASE
+    #
+    #         ... more .....
+    #
+    - name: fetch ecommerce configuration from Kubernetes secrets
+      id: get-ecommerce-secret
+      uses: openedx-actions/tutor-k8s-get-secret@v1.0.0
+      with:
+        eks-namespace: ${{ inputs.namespace }}
+        eks-secret-name: ecommerce-config
 
     - name: install ecommerce plugin
       id: install-plugin
