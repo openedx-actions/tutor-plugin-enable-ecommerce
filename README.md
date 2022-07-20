@@ -15,6 +15,8 @@ This action is designed to work seamlessly with Kubernetes secrets created by th
 
 **IMPORTANT SECURITY DISCLAIMER**: Sensitive data contained in Kubernetes secrets is masked in Github Actions logs and console output provided that the secret was created with the Terraform scripts provided in the Cookiecutter. If you are working a Kubernetes secret created outside of the Cookiecutter then **be aware that you run a non-zero risk of your sensitive data becoming exposed inside the Github Actions log data and/or console output**.
 
+**ADDITIONAL CONFIGURATION REQUIRED**: An ecommerce payment processors configuration yaml file is expected to exist in the `secrets` S3 bucket for your platform environment. If it is not found then this action will upload a template with scaffolding to your `secrets` buckets. The template contains scaffolding for cybersource, paypal and stripe and can be viewed in the file `ecommerce-payment-processors.yml` located in the root of this repository.
+
 ## Usage:
 
 
@@ -50,9 +52,13 @@ jobs:
 
       # This action.
       - name: Enable tutor plugin - Ecommerce
-        uses: openedx-actions/tutor-enable-plugin-ecommerce@v1.0.1
+        uses: openedx-actions/tutor-enable-plugin-ecommerce@v1.0.2
         with:
           namespace: openedx-prod
+          secrets-s3-bucket-name: {global_platform_name}-{global_platform_region}-{environment_name}-secrets
+          currency: USD
+          enabled-payment-processors: '["stripe", "paypal"]'
+
 
       #
       # ... more steps to deploy your Open edX instance to k8s ...

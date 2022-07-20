@@ -11,6 +11,20 @@ inputs:
     description: 'The Kubernetes namesapce to which the Open edX platform environment will be deployed. Example: openedx-prod'
     required: true
     type: string
+  secrets-s3-bucket-name:
+    description: 'The name of the AWS S3 bucket containing your ecommerce-payment-processors.yml file'
+    required: true
+    type: string
+  currency:
+    description: 'The base currency for your ecommerce transactions. Default: USD'
+    required: false
+    type: string
+    default: USD
+  enabled-payment-processors:
+    description: 'The list of card processors to enable for your site. Default: ["stripe", "paypal"]'
+    required: false
+    type: string
+    default: '["stripe", "paypal"]'
 runs:
   using: "composite"
   steps:
@@ -35,18 +49,13 @@ runs:
     # retrieve the ecommerce payment processor configuration that
     # we scaffolded in Terraform and then stored in Kubernetes secrets. These include:
     #
-    #  ECOMMERCE_CURRENCY: USD                                                                                                        │
-    #  ECOMMERCE_ENABLE_IDENTITY_VERIFICATION: "true"                                                                                 │
-    #  ECOMMERCE_ENABLED_CLIENT_SIDE_PAYMENT_PROCESSORS: ""                                                                           │
-    #  ECOMMERCE_ENABLED_PAYMENT_PROCESSORS: stripe, paypal                                                                           │
-    #  ECOMMERCE_EXTRA_PAYMENT_PROCESSOR_CLASSES: ""                                                                                  │
-    #  ECOMMERCE_EXTRA_PIP_REQUIREMENTS: ""                                                                                           │
-    #  ECOMMERCE_PAYMENT_PROCESSORS: |                                                                                                │
-    #    edx:                                                                                                                         │
-    #        cybersource:                                                                                                             │
-    #            access_key: SET-ME-PLEASE
-    #
-    #         ... more .....
+    #  ECOMMERCE_CURRENCY: USD
+    #  ECOMMERCE_ENABLE_IDENTITY_VERIFICATION: "true"
+    #  ECOMMERCE_ENABLED_CLIENT_SIDE_PAYMENT_PROCESSORS: ""
+    #  ECOMMERCE_ENABLED_PAYMENT_PROCESSORS: stripe, paypal
+    #  ECOMMERCE_EXTRA_PAYMENT_PROCESSOR_CLASSES: ""
+    #  ECOMMERCE_EXTRA_PIP_REQUIREMENTS: ""
+    #  ECOMMERCE_PAYMENT_PROCESSORS: ""
     #
     - name: fetch ecommerce configuration from Kubernetes secrets
       id: get-ecommerce-secret
@@ -60,11 +69,26 @@ runs:
       shell: bash
       run: pip install tutor-ecommerce
 
+    - name: Attempt aws s3 download of ecommerce-payment-processors.yml
+      id: download-aws-s3
+      continue-on-error: true
+      shell: bash
+      run: |-
+        aws s3 cp s3://${{ inputs.secrets-s3-bucket-name }}/ecommerce-payment-processors.yml ./
+
+    - name: Initialize aws s3 with scaffold of ecommerce-payment-processors.yml
+      id: upload-aws-s3
+      if: ${{ failure() }}
+      shell: bash
+      run: |-
+        echo "copying a scaffolded payment processor template file to s3://stepwisemath-global-prod-secrets/ecommerce-payment-processors.yml"
+        aws s3 cp s3://${{ inputs.secrets-s3-bucket-name }}/ecommerce-payment-processors.yml ./
+
     - name: Enable and configure ecommerce plugin
       id: config-save
       shell: bash
       run: |-
         tutor plugins enable ecommerce
-        tutor config save --set ECOMMERCE_ENABLE_IDENTITY_VERIFICATION=false \
-                          --set ECOMMERCE_ENABLED_CLIENT_SIDE_PAYMENT_PROCESSORS=[] \
-                          --set ECOMMERCE_CURRENCY=USD
+        tutor config save --set "ECOMMERCE_PAYMENT_PROCESSORS=$(cat ecommerce-payment-processors.yml)" \
+                          --set 'ECOMMERCE_ENABLED_PAYMENT_PROCESSORS=${{ inputs.enabled-payment-processors }}' \
+                          --set ECOMMERCE_CURRENCY="${{ inputs.currency }}" \
