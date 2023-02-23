@@ -33,7 +33,7 @@ runs:
 
     # retrieve the MySQL connection parameters that we created in Terraform
     # and then stored in Kubernetes secrets. These include:
-    #   MYSQL_HOST: mysql.app.mrionline.com
+    #   MYSQL_HOST: mysql.service.yourschool.edu
     #   MYSQL_PORT: "3306"
     #   ECOMMERCE_MYSQL_USERNAME: openedx
     #   ECOMMERCE_MYSQL_PASSWORD: **************
