@@ -1,8 +1,9 @@
 <img src="https://avatars.githubusercontent.com/u/40179672" width="75">
 
-[![hack.d Lawrence McDaniel](https://img.shields.io/badge/hack.d-Lawrence%20McDaniel-orange.svg)](https://lawrencemcdaniel.com)
-[![discuss.overhang.io](https://img.shields.io/static/v1?logo=discourse&label=Forums&style=flat-square&color=ff0080&message=discuss.overhang.io)](https://discuss.overhang.io)
-[![docs.tutor.overhang.io](https://img.shields.io/static/v1?logo=readthedocs&label=Documentation&style=flat-square&color=blue&message=docs.tutor.overhang.io)](https://docs.tutor.overhang.io)<br/>
+[![Tests](https://github.com/openedx-actions/tutor-plugin-enable-ecommerce/actions/workflows/testRelease.yml/badge.svg)](https://github.com/openedx-actions/tutor-plugin-enable-ecommerce/actions)
+[![Open edX Discussion](https://img.shields.io/static/v1?logo=discourse&label=Forums&style=flat-square&color=000000&message=discuss.openedx.org)](https://discuss.openedx.org/)
+[![docs.tutor.overhang.io](https://img.shields.io/static/v1?logo=readthedocs&label=Documentation&style=flat-square&color=blue&message=docs.tutor.overhang.io)](https://docs.tutor.overhang.io)
+[![hack.d Lawrence McDaniel](https://img.shields.io/badge/hack.d-Lawrence%20McDaniel-orange.svg)](https://lawrencemcdaniel.com)<br/>
 [![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)](https://aws.amazon.com/)
 [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white)](https://kubernetes.io/)
@@ -17,8 +18,7 @@ This action is designed to work seamlessly with Kubernetes secrets created by th
 
 **ADDITIONAL CONFIGURATION REQUIRED**: An ecommerce payment processors configuration yaml file is expected to exist in the `secrets` S3 bucket for your platform environment. If it is not found then this action will upload a template with scaffolding to your `secrets` buckets. The template contains scaffolding for cybersource, paypal and stripe and can be viewed in the file `ecommerce-payment-processors.yml` located in the root of this repository.
 
-## Usage:
-
+## Usage
 
 ```yaml
 name: Example workflow
@@ -30,11 +30,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # required antecedent
-      - uses: actions/checkout@v3.5.0
+      - uses: actions/checkout
 
       # required antecedent
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials
         with:
           aws-access-key-id: ${{ secrets.THE_NAME_OF_YOUR_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.THE_NAME_OF_YOUR_AWS_SECRET_ACCESS_KEY }}
@@ -42,7 +42,7 @@ jobs:
 
       # install and configure tutor & kubectl
       - name: Configure Github workflow environment
-        uses: openedx-actions/tutor-k8s-init@v1.0.8
+        uses: openedx-actions/tutor-k8s-init
         with:
           namespace: openedx-prod
 
@@ -52,7 +52,7 @@ jobs:
 
       # This action.
       - name: Enable tutor plugin - Ecommerce
-        uses: openedx-actions/tutor-enable-plugin-ecommerce@v1.0.2
+        uses: openedx-actions/tutor-enable-plugin-ecommerce
         with:
           namespace: openedx-prod
           secrets-s3-bucket-name: {global_platform_name}-{global_platform_region}-{environment_name}-secrets
