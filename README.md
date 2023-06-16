@@ -51,10 +51,12 @@ jobs:
       #
 
       # This action.
+      # tutor-ecommerce-version is an optional input
       - name: Enable tutor plugin - Ecommerce
         uses: openedx-actions/tutor-plugin-enable-ecommerce@v1
         with:
           namespace: openedx-prod
+          tutor-ecommerce-version: latest
           secrets-s3-bucket-name: {global_platform_name}-{global_platform_region}-{environment_name}-secrets
           currency: USD
           enabled-payment-processors: '["stripe", "paypal"]'
