@@ -11,6 +11,11 @@ inputs:
     description: 'The Kubernetes namespace to which the Open edX platform environment will be deployed. Example: openedx-prod'
     required: true
     type: string
+  tutor-ecommerce-version:
+    description: 'The version of tutor-ecommerce to install'
+    required: false
+    default: latest
+    type: string
   secrets-s3-bucket-name:
     description: 'The name of the AWS S3 bucket containing your ecommerce-payment-processors.yml file'
     required: true
@@ -67,7 +72,7 @@ runs:
     - name: install ecommerce plugin
       id: install-plugin
       shell: bash
-      run: pip install tutor-ecommerce
+      run: pip install tutor-ecommerce${{ inputs.tutor-ecommerce-version != 'latest' && format('=={0}', inputs.tutor-ecommerce-version) || '' }}
 
     - name: Attempt aws s3 download of ecommerce-payment-processors.yml
       id: download-aws-s3
